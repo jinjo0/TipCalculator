@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -13,6 +14,10 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.InputField
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.ui.theme.widgets.RoundIconButton
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,41 +81,72 @@ fun TopHeader(totalPerPerson: Double = 134.0){
 @Preview
 @Composable
 fun MainContent(){
-
-
-    val totalBillState= remember{
-        mutableStateOf("")
-    }
-    val validState = remember(totalBillState.value){
-        totalBillState.value.toString().trim().isNotEmpty()
-    }
-
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val xazkleazeae: String =" 0"
-    Surface(
-        modifier= Modifier
-            .padding(2.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-        border = BorderStroke(width = 1.dp, color= Color.LightGray)
-    ){
-        Column() {
-            InputField(
-                valueState = totalBillState,
-                labelId = "Enter Bill",
-                enabled = true,
-                isSingleLine = true,
-                onAction = KeyboardActions {
-                    if(!validState) return@KeyboardActions
-                    //Todo - onvaluechanged
-
-                    keyboardController?.hide()
-
-                }
-                )
-        }
+    BillForm(){
+        billAmt ->Log.d("AMT", "Main content: ${billAmt.toInt()}")
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun BillForm(modifier: Modifier = Modifier,
+             onValChange: (String)-> Unit= {}){
+
+
+                 val totalBillState= remember{
+                     mutableStateOf("")
+                 }
+                 val validState = remember(totalBillState.value){
+                     totalBillState.value.toString().trim().isNotEmpty()
+                 }
+
+                 val keyboardController = LocalSoftwareKeyboardController.current
+
+                 Surface(
+                     modifier= Modifier
+                         .padding(2.dp)
+                         .fillMaxWidth(),
+                     shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                     border = BorderStroke(width = 1.dp, color= Color.LightGray)
+                 ){
+                     Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start) {
+                         InputField(
+                             valueState = totalBillState,
+                             labelId = "Enter Bill",
+                             enabled = true,
+                             isSingleLine = true,
+                             onAction = KeyboardActions {
+                                 if(!validState) return@KeyboardActions
+                                 //Todo - onvaluechanged
+                                onValChange(totalBillState.value.trim())
+                                 keyboardController?.hide()
+                             })
+
+                         if(!validState){
+                             Row(modifier = Modifier.padding(3.dp),
+                             horizontalArrangement = Arrangement.Start){
+                                 Text("Split",
+                                     modifier = Modifier.align(alignment = Alignment.CenterVertically))
+                                 Spacer(modifier= Modifier.width(120.dp))
+                                 Row(modifier=Modifier.padding(horizontal = 3.dp),
+                                     horizontalArrangement = Arrangement.End
+                                 ) {
+                                    RoundIconButton(
+                                        imageVector = Icons.Default.Add,
+                                        onClick = { /*TODO*/ })
+                                     RoundIconButton(
+                                         imageVector = Icons.Default.,
+                                         onClick = { /*TODO*/ })
+                                 }
+                             }
+                         }
+
+                     }
+                 }
+
+
+
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
